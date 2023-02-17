@@ -4,16 +4,31 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+- none
+
+variables:
+  REPO_NAME: 'vcpkg'
+  VCPKG_ROOT: '$(Build.SourcesDirectory)'
 
 pool:
-  vmImage: ubuntu-latest
+    name: 'MAPAL Design'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - task: BatchScript@1
+    displayName: 'Bootstrap'
+    inputs:
+      filename: 'bootstrap-vcpkg.bat'
+  
+  - script: vcpkg.exe install azure-storage-cpp:x64-windows
+    displayName: 'azure-storage-cpp'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - script: vcpkg.exe install curl[sspi]:x64-windows
+    displayName: 'curl[sspi]'
+
+  - script: vcpkg integrate install
+    displayName: 'integrate install'
+
+  - script: |
+      echo Add other tasks to build, test, and deploy your project.
+      echo See https://aka.ms/yaml
+    displayName: 'Run a multi-line script'
